@@ -1,0 +1,127 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NIGHTMARE FPS - Combate 3D Profissional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- HUD Principal -->
+        <div id="hud">
+            <div class="hud-top">
+                <div class="health-container">
+                    <div class="health-label">SAÚDE</div>
+                    <div class="health-bar-bg">
+                        <div id="health-fill" class="health-fill"></div>
+                    </div>
+                    <div id="health-text" class="health-text">100</div>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat">
+                        <span class="stat-icon">🎯</span>
+                        <span id="kill-count" class="stat-value">0</span>
+                        <span class="stat-label">ABATES</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">👾</span>
+                        <span id="enemy-count" class="stat-value">0</span>
+                        <span class="stat-label">INIMIGOS</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">⚡</span>
+                        <span id="wave-count" class="stat-value">1</span>
+                        <span class="stat-label">ONDA</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="weapon-container">
+                <div class="weapon-name">RIFLE DE ASSALTO</div>
+                <div class="ammo-display">
+                    <span id="current-ammo" class="current-ammo">30</span>
+                    <span class="ammo-separator">/</span>
+                    <span id="reserve-ammo" class="reserve-ammo">120</span>
+                </div>
+                <div class="ammo-bar-bg">
+                    <div id="ammo-fill" class="ammo-fill"></div>
+                </div>
+            </div>
+            
+            <div class="crosshair">
+                <div class="crosshair-line top"></div>
+                <div class="crosshair-line bottom"></div>
+                <div class="crosshair-line left"></div>
+                <div class="crosshair-line right"></div>
+                <div class="crosshair-dot"></div>
+            </div>
+            
+            <div id="hitmarker" class="hitmarker"></div>
+            <div id="damage-overlay" class="damage-overlay"></div>
+        </div>
+        
+        <!-- Tela de início / Game Over -->
+        <div id="start-screen" class="overlay-screen active">
+            <div class="screen-content">
+                <h1 class="game-title">NIGHTMARE FPS</h1>
+                <div class="title-glow"></div>
+                <p class="subtitle">Sobreviva o máximo possível</p>
+                <div class="controls-info">
+                    <div class="control-group">
+                        <span class="key">WASD</span>
+                        <span>Movimentar</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="key">MOUSE</span>
+                        <span>Mirar</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="key">CLIQUE ESQ.</span>
+                        <span>Atirar</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="key">R</span>
+                        <span>Recarregar</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="key">SPACE</span>
+                        <span>Pular</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="key">SHIFT</span>
+                        <span>Correr</span>
+                    </div>
+                </div>
+                <button id="start-button" class="start-button">INICIAR COMBATE</button>
+            </div>
+        </div>
+        
+        <div id="game-over-screen" class="overlay-screen">
+            <div class="screen-content">
+                <h2 class="game-over-title">MORTE</h2>
+                <div class="stats-summary">
+                    <p>Abates: <span id="final-kills">0</span></p>
+                    <p>Ondas: <span id="final-waves">0</span></p>
+                    <p>Tempo: <span id="final-time">0</span>s</p>
+                </div>
+                <button id="restart-button" class="start-button">TENTAR NOVAMENTE</button>
+            </div>
+        </div>
+        
+        <!-- Mensagens de jogo -->
+        <div id="game-messages" class="game-messages"></div>
+    </div>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
