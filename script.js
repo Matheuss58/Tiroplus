@@ -2,6 +2,119 @@
 import * as THREE from 'three';
 
 // ====================================================
+// MUSIC PLAYER - Playlist com 5 músicas em loop infinito
+// ====================================================
+class MusicPlayer {
+    constructor() {
+        // === CONFIGURE AQUI SUAS 5 MÚSICAS ===
+        // Substitua as URLs pelos seus próprios arquivos de música
+        this.playlist = [
+            { name: "Metal Action", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "Electronic Fight", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { name: "Dark Ambient", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { name: "Synthwave", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { name: "Cinematic", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" }
+        ];
+        
+        this.currentTrackIndex = 0;
+        this.audioElement = null;
+        this.isMuted = false;
+        this.isPlaying = false;
+        this.initAudio();
+        this.setupUI();
+    }
+
+    initAudio() {
+        this.audioElement = new Audio();
+        this.audioElement.volume = 0.5;
+        this.audioElement.addEventListener('ended', () => this.nextTrack());
+    }
+
+    setupUI() {
+        const musicNameSpan = document.getElementById('music-name');
+        const muteBtn = document.getElementById('music-mute-btn');
+        
+        if (muteBtn) {
+            muteBtn.addEventListener('click', () => this.toggleMute());
+        }
+        
+        // Atualiza o nome da música periodicamente (quando mudar)
+        this.uiUpdateInterval = setInterval(() => {
+            if (musicNameSpan && this.playlist[this.currentTrackIndex]) {
+                let displayName = this.playlist[this.currentTrackIndex].name;
+                if (displayName.length > 30) displayName = displayName.substring(0, 27) + '...';
+                musicNameSpan.textContent = `🎵 ${displayName}`;
+            }
+        }, 500);
+    }
+
+    startPlaylist() {
+        if (!this.audioElement) return;
+        if (this.isPlaying) return;
+        
+        this.currentTrackIndex = 0;
+        this.loadAndPlayTrack(this.currentTrackIndex);
+        this.isPlaying = true;
+    }
+
+    loadAndPlayTrack(index) {
+        if (!this.audioElement) return;
+        if (index >= this.playlist.length) {
+            // Se por algum motivo estourar o índice, volta ao início
+            this.currentTrackIndex = 0;
+            this.loadAndPlayTrack(0);
+            return;
+        }
+        
+        const track = this.playlist[index];
+        if (!track || !track.url) {
+            console.warn("Música não encontrada, pulando para a próxima.");
+            this.nextTrack();
+            return;
+        }
+        
+        this.audioElement.src = track.url;
+        this.audioElement.load();
+        this.audioElement.play().catch(e => {
+            console.warn("Autoplay bloqueado ou erro ao tocar música:", e);
+            // Tenta novamente após interação do usuário (o jogo já lida com isso)
+            this.isPlaying = false;
+        });
+        
+        // Atualiza nome imediatamente
+        const musicNameSpan = document.getElementById('music-name');
+        if (musicNameSpan) {
+            let name = track.name;
+            if (name.length > 30) name = name.substring(0, 27) + '...';
+            musicNameSpan.textContent = `🎵 ${name}`;
+        }
+    }
+
+    nextTrack() {
+        if (!this.audioElement) return;
+        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.playlist.length;
+        this.loadAndPlayTrack(this.currentTrackIndex);
+    }
+
+    toggleMute() {
+        if (!this.audioElement) return;
+        this.isMuted = !this.isMuted;
+        this.audioElement.muted = this.isMuted;
+        
+        const muteBtn = document.getElementById('music-mute-btn');
+        if (muteBtn) {
+            muteBtn.textContent = this.isMuted ? "🔇" : "🔈";
+        }
+    }
+
+    setVolume(volume) {
+        if (this.audioElement) {
+            this.audioElement.volume = Math.max(0, Math.min(1, volume));
+        }
+    }
+}
+
+// ====================================================
 // CLASSE PRINCIPAL DO JOGO - Game
 // ====================================================
 class Game {
@@ -35,6 +148,7 @@ class Game {
         this.uiManager = null;
         this.particleSystem = null;
         this.audioManager = null;
+        this.musicPlayer = null;
         this.inputManager = null;
         this.world = null;
         this.physics = null;
@@ -131,6 +245,7 @@ class Game {
         this.uiManager = new UIManager();
         this.particleSystem = new ParticleSystem(this.scene);
         this.cameraController = new CameraController(this.camera, this.player, this.weapon);
+        this.musicPlayer = new MusicPlayer();
     }
     
     setupEventListeners() {
@@ -187,6 +302,11 @@ class Game {
         this.uiManager.updateWave(1);
         this.uiManager.updateHealth(100);
         
+        // Inicia a música de fundo
+        if (this.musicPlayer && !this.musicPlayer.isPlaying) {
+        this.musicPlayer.startPlaylist();
+    }
+
         // Spawn inicial
         for (let i = 0; i < 3; i++) {
             setTimeout(() => {
